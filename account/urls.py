@@ -1,11 +1,13 @@
-from django.urls import path
-from .views import EmailVerificationView, VerifyEmailView, RegisterView,LoginView,LogoutView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import UserListView, UserRetrieveUpdateDestroyView, RegisterView, UserViewSet
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')  
 
 urlpatterns = [
-    path('email/verify/', EmailVerificationView.as_view(), name='email_verify'),
-    path('email/confirm/', VerifyEmailView.as_view(), name='email_confirm'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('login/',LoginView.as_view(),name="login"),
-    path('logout/',LogoutView.as_view(),name="Logout"),
-
+    path('users/', UserListView.as_view(), name='user-list'),
+    path('users/<str:email>/', UserRetrieveUpdateDestroyView.as_view(), name='user-detail'),
+    path('', include(router.urls)), 
 ]

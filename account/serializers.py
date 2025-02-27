@@ -1,71 +1,43 @@
-from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import User
-from django.core.exceptions import ValidationError
-from django.core.validators import EmailValidator
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.password_validation import validate_password
 
-class EmailVerificationSerializer(serializers.Serializer):
-    email = serializers.CharField()
-class VerifyCodeSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    verification_code = serializers.IntegerField()
+User = get_user_model()
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password1','password2', 'gender', 'birth_date')
+        fields = ('id', 'email', 'full_name', 'balance')
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'full_name', 'password', 'password2')
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return attrs
 
     def create(self, validated_data):
-        password = validated_data.get('password1')
         user = User.objects.create_user(
-            email=validated_data.get('email'),
-            password=password,
-            gender=validated_data.get('gender'),
-            birth_date=validated_data.get('birth_date')
+            email=validated_data['email'],
+            full_name=validated_data['full_name'],
+            password=validated_data['password']
         )
         return user
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-       email = attrs.get('email')
-       password1 = attrs.get('password1')
-       password2 = attrs.get('password2')
-
-       if not email:
-           raise serializers.ValidationError('Please enter an email address.')
-       try:
-            EmailValidator()(email)
-       except ValidationError:
-           raise serializers.ValidationError('Please enter a valid email address.')
-
-       if User.objects.filter(email=email).exists():
-        raise serializers.ValidationError("This email is already registered.")
-       
-       if not email:
-           raise serializers.ValidationError('Please enter your email.')
-
-       if password1 != password2:
-           raise serializers.ValidationError("Passwords must match.")
-
-
-
-       return super().validate(attrs)
-   
-   
-class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
-
-        if email and password:
-            user = authenticate(email=email, password=password)
-            if user:
-                if not user.is_active:
-                    raise serializers.ValidationError("User deactivated.")
-                return {"user": user}  # ✅ Вернём словарь с ключом "user"
-            raise serializers.ValidationError("Error login credentials.")
-        raise serializers.ValidationError("Email and password required.")
+        # Foydalanuvchi email orqali autentifikatsiya qilish
+        user = User.objects.filter(email=attrs.get('email')).first()
+        if user and user.check_password(attrs.get('password')):
+            attrs['email'] = user.email
+            data = super().validate(attrs)
+            data.update({'user': UserSerializer(user).data})
+            return data
+        raise serializers.ValidationError("Invalid email or password.")

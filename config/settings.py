@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Magenta',
-    'account'
+    'account',
 ]
 
 
@@ -89,6 +89,12 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',  # ✅ Faqat JSON render qilish
     ],
+}
+
+AUTH_USER_MODEL = 'account.User'
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 WSGI_APPLICATION = 'config.wsgi.application'
