@@ -7,6 +7,7 @@ from .models import Category, Template
 from .serializers import CategorySerializer, TemplateSerializer
 
 
+
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
@@ -26,6 +27,11 @@ class CategoryViewSet(mixins.CreateModelMixin,
             instance.slug = slugify(instance.name)
             instance.save()
 
+    def destroy(self, request, *args, **kwargs):
+        """Customize delete response message."""
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "Category deleted successfully!"})
 
     @action(detail=False, methods=['get'], url_path='all')
     def all_categories(self, request):
@@ -33,6 +39,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
         categories = Category.objects.all()
         serializer = self.get_serializer(categories, many=True)
         return Response(serializer.data)
+
 
 
 class TemplateViewSet(mixins.CreateModelMixin,
@@ -53,6 +60,12 @@ class TemplateViewSet(mixins.CreateModelMixin,
         if not instance.slug:
             instance.slug = slugify(instance.name)
             instance.save()
+
+    def destroy(self, request, *args, **kwargs):
+        """Customize delete response message."""
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "Template deleted successfully!"})
 
     @action(detail=False, methods=['get'], url_path='all')
     def all_templates(self, request):

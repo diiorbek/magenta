@@ -6,6 +6,7 @@ from rest_framework.schemas import get_schema_view
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
+    # path('profile/', include('Magenta.urls')),
     path('admin/', admin.site.urls),
     path('api/magenta/', include('Magenta.urls')),
     path('api/account/', include('account.urls')),

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import authenticate
 
 User = get_user_model()
 
@@ -41,3 +42,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             data.update({'user': UserSerializer(user).data})
             return data
         raise serializers.ValidationError("Invalid email or password.")
+    
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = authenticate(username=data["username"], password=data["password"])
+        if not user:
+            raise serializers.ValidationError("Incorrect credentials")
+        return user
