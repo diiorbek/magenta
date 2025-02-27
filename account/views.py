@@ -9,16 +9,17 @@ from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 User = get_user_model()
 
 class LoginView(APIView):
+    serializer_class = LoginSerializer  # Serializerni qo'shish
+
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data["user"]
+            user = serializer.validated_data
             refresh = RefreshToken.for_user(user)
             return Response({
                 "message": "Login successful",
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
-                "user": UserSerializer(user).data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

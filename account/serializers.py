@@ -13,16 +13,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('email', 'full_name', 'password', 'password2')
-
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-        return attrs
+        fields = ('email', 'full_name', 'password')
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -45,11 +39,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(username=data["username"], password=data["password"])
+        user = authenticate(email=data["email"], password=data["password"])
         if not user:
             raise serializers.ValidationError("Incorrect credentials")
         return user
