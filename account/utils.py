@@ -13,3 +13,8 @@ def send_verification_email(email):
 
     response = requests.get(url, params=params)
     return code
+
+
+from .models import User
+
+print(User.objects.all())

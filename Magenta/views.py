@@ -7,7 +7,7 @@ from .models import Category, Template
 from .serializers import CategorySerializer, TemplateSerializer
 
 
-
+@extend_schema(tags=["Categories"])
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
@@ -16,6 +16,8 @@ class CategoryViewSet(mixins.CreateModelMixin,
     """
     Manage template categories.
     """
+   
+    
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
@@ -41,7 +43,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
         return Response(serializer.data)
 
 
-
+@extend_schema(tags=["Templates"])
 class TemplateViewSet(mixins.CreateModelMixin,
                       mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
