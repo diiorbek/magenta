@@ -60,52 +60,39 @@ class RegisterView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
-@extend_schema(tags=["Registration"])
+
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework import status
+from drf_spectacular.utils import extend_schema
+from rest_framework import generics
+from .models import User
+from .serializers import UserSerializer
+
+@extend_schema(tags=["Registration"], summary="List users", description="Retrieve a list of all registered users.")
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = None  
 
-    @swagger_auto_schema(
-        tags=["Registration"],
-        operation_summary="List users",
-        operation_description="Retrieve a list of all registered users."
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
-@extend_schema(tags=["Registration"])
+@extend_schema(tags=["Registration"], summary="Get, update, or delete the authenticated user")
 class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'email'  
+    permission_classes = [IsAuthenticated]  # Доступ только для авторизованных пользователей
 
-    @swagger_auto_schema(
-        tags=["Registration"],
-        operation_summary="Get user details",
-        operation_description="Retrieve user details by email."
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+    def get_object(self):
+        """Возвращает текущего аутентифицированного пользователя на основе JWT-токена."""
+        return self.request.user
 
-    @swagger_auto_schema(
-        tags=["Registration"],
-        operation_summary="Update user",
-        operation_description="Update user details by email."
-    )
-    def put(self, request, *args, **kwargs):
-        return super().put(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        tags=["Registration"],
-        operation_summary="Delete user",
-        operation_description="Delete a user by email.",
-        responses={200: openapi.Response("User deleted successfully")}
-    )
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
+        """Удаляет текущего пользователя."""
+        user = self.get_object()
+        user.delete()
         return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
+
+
 
 @extend_schema(tags=["Registration"])
 class ChangePasswordView(APIView):
