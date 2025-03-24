@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from django.utils.text import slugify
-from .models import Category, Template
-from .serializers import CategorySerializer, TemplateSerializer
+from .models import Category, Template, SubCategory
+from .serializers import CategorySerializer, TemplateSerializer, SubCategorySerializer
 
 
 @extend_schema(tags=["Categories"])
@@ -69,10 +69,24 @@ class TemplateViewSet(mixins.CreateModelMixin,
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({"message": "Template deleted successfully!"})
-
+    
+    
     @action(detail=False, methods=['get'], url_path='all', permission_classes=[])  # Открытый доступ
     def all_templates(self, request):
         """Retrieve all templates."""
         templates = Template.objects.all()
         serializer = self.get_serializer(templates, many=True)
         return Response(serializer.data)
+
+@extend_schema(tags=["Subcategories"])
+class SubCategoryViewSet(mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
+
+    queryset = SubCategory.objects.all()
+    serializer_class = SubCategorySerializer
+    lookup_field = 'slug'
+    
+    permission_classes = [IsAdminUser]

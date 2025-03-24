@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserListView, UserRetrieveUpdateDestroyView, RegisterView, LoginView, ChangePasswordView
-from .serializers import CustomTokenObtainPairSerializer
+from .views import LoginView
 
 
 router = DefaultRouter()
