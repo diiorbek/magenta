@@ -25,8 +25,8 @@ class Template(models.Model):
     description = RichTextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='templates')
-    file = models.FileField(upload_to="template_files", blank=True, null=True)
-    video = models.FileField(upload_to="template_videos", blank=True, null=True)  # Добавляем поле для видео
+    file = models.FileField(upload_to="template_files")
+    video = models.FileField(upload_to="template_videos")  # Добавляем поле для видео
     created_at = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True)
     download_count = models.PositiveIntegerField(default=0)
@@ -54,7 +54,7 @@ class TemplateImage(models.Model):
 class SubCategory(models.Model):
     title = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
-    image = models.ImageField(upload_to="sub_category_images", blank=True, null=True)
+    image = models.ImageField(upload_to="sub_category_images")
     slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):
