@@ -184,8 +184,8 @@ EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 EMAIL_FILE_PATH = "gmail-messages/"
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Твое API',
-    'DESCRIPTION': 'Описание твоего API',
+    'TITLE': 'Magenta API',
+    'DESCRIPTION': 'Magenta API',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
