@@ -201,4 +201,3 @@ SPECTACULAR_SETTINGS = {
     },
     'SECURITY': [{'Bearer': []}],  # Применяем JWT ко всем запросам
 }  
-  
