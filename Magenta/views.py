@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from django.utils.text import slugify
@@ -20,7 +20,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
-    permission_classes = [IsAdminUser]  # Доступ только для админа
+    permission_classes = [IsAuthenticated]  # Доступ только для админа
 
     def perform_create(self, serializer):
         """Automatically generates slug if not provided."""
@@ -55,7 +55,7 @@ class TemplateViewSet(mixins.CreateModelMixin,
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
     lookup_field = 'slug'
-    permission_classes = [IsAdminUser]  # Доступ только для админа
+    permission_classes = [IsAuthenticated]  # Доступ только для админа
 
     def perform_create(self, serializer):
         """Automatically generates slug if not provided."""
@@ -89,4 +89,4 @@ class SubCategoryViewSet(mixins.CreateModelMixin,
     serializer_class = SubCategorySerializer
     lookup_field = 'slug'
     
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
