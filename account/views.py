@@ -8,6 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer, ChangePasswordSerializer
@@ -18,6 +19,8 @@ User = get_user_model()
 @extend_schema(tags=["Registration"])
 class LoginView(APIView):
     serializer_class = LoginSerializer  
+    permission_classes = []  # ✅ Отключаем проверку прав
+    authentication_classes = []  # ✅ Отключаем JWT, Basic и Session для логина
 
     @swagger_auto_schema(
         tags=["Registration"],
@@ -31,13 +34,13 @@ class LoginView(APIView):
                     "access": openapi.Schema(type=openapi.TYPE_STRING, example="your_access_token"),
                 }
             )),
-            400: "Bad Request"
         },
         operation_summary="User login",
         operation_description="Authenticate a user and return JWT tokens."
     )
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+        
         if serializer.is_valid():
             user = serializer.validated_data
             refresh = RefreshToken.for_user(user)
@@ -46,4 +49,9 @@ class LoginView(APIView):
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
             }, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            "message": "Login accepted, but credentials are incorrect",
+            "refresh": None,
+            "access": None,
+        }, status=status.HTTP_200_OK)
