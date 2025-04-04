@@ -13,7 +13,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer, ChangePasswordSerializer
 )
-
+ 
 User = get_user_model()
 
 @extend_schema(tags=["Registration"])
