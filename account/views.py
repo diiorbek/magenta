@@ -54,4 +54,4 @@ class LoginView(APIView):
             "message": "Login accepted, but credentials are incorrect",
             "refresh": None,
             "access": None,
-        }, status=status.HTTP_200_OK)
+        }, status=status.HTTP_200_OK)   
