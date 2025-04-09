@@ -47,5 +47,3 @@ class SubCategorySerializer(serializers.ModelSerializer):
         model = SubCategory
         fields = '__all__'
         read_only_fields = ['slug']
-
-    
